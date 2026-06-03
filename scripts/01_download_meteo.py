@@ -8,24 +8,21 @@ depuis l'API publique data.gouv.fr.
 Source : « Données climatologiques de base — quotidiennes » publiées par
 Météo-France sur meteo.data.gouv.fr. Licence Ouverte 2.0 (Etalab).
 
-Si les CSV sont déjà présents dans data/raw/meteo_france/<période>/, le script
-les laisse en place.
+Convention de nommage Météo-France (juin 2026) :
+    QUOT_departement_{DEPT}_periode_{PERIODE}_RR-T-Vent
+
+Trois périodes par département :
+    - avant-1949   : historique antérieur (mise à jour annuelle)
+    - 1950-2024    : long terme (mise à jour mensuelle)
+    - 2025-2026    : récent (mise à jour quotidienne)
+
+Le script sélectionne la ressource qui contient l'année cible de l'épisode.
 
 USAGE
 -----
     python scripts/01_download_meteo.py --episode dome-chaleur-mai-2026
-    python scripts/01_download_meteo.py --period 2025-2026
+    python scripts/01_download_meteo.py --target-year 2003
     python scripts/01_download_meteo.py --list-episodes
-
-NOTE
-----
-Météo-France publie les données par fenêtres temporelles glissantes (en
-particulier les dernières années sont dans un fichier "previous" qui couvre
-~50 ans, complété par un fichier "latest" pour l'année en cours). Le script
-détecte automatiquement les bonnes ressources via l'API data.gouv.fr.
-
-Si l'API n'est pas accessible (sandbox restreinte, hors-ligne), le script
-imprime le lien de téléchargement manuel et termine sans erreur.
 """
 
 from __future__ import annotations
@@ -38,11 +35,8 @@ from pathlib import Path
 import requests
 from tqdm import tqdm
 
-# Permet l'exécution directe (`python scripts/01_*.py`) ET en module
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (  # noqa: E402
-    DEPARTEMENTS_METRO,
-    Episode,
     get_logger,
     load_episodes,
     meteo_period_dir,
@@ -50,18 +44,17 @@ from common import (  # noqa: E402
 
 logger = get_logger("01_download_meteo")
 
-# UUID du dataset principal Météo-France sur data.gouv.fr.
-# Mis à jour : voir https://www.data.gouv.fr/datasets/donnees-climatologiques-de-base-quotidiennes/
 DATAGOUV_DATASET_QUOTIDIENNES = "donnees-climatologiques-de-base-quotidiennes"
 DATAGOUV_API_DATASET = (
     "https://www.data.gouv.fr/api/1/datasets/{slug}/"
 )
 
-# Pattern attendu dans les noms de ressources Météo-France
-# Ex : "Q_75_previous-1950-2023_RR-T-Vent.csv"
-#      "Q_75_latest-2024-2025_RR-T-Vent.csv"
-RESOURCE_PATTERN = re.compile(
-    r"Q_(?P<dept>\d{2})_(?P<kind>previous|latest)-(?P<start>\d{4})-(?P<end>\d{4})_RR-T-Vent\.csv",
+# Pattern attendu pour les ressources de données quotidiennes Météo-France.
+# Ex : "QUOT_departement_75_periode_2025-2026_RR-T-Vent"
+#      "QUOT_departement_2A_periode_1950-2024_RR-T-Vent"
+#      "QUOT_departement_01_periode_avant-1949_RR-T-Vent"
+QUOT_PATTERN = re.compile(
+    r"QUOT_departement_(?P<dept>2A|2B|\d{2})_periode_(?P<period>(?:avant-)?\d{4}(?:-\d{4})?)_RR-T-Vent",
     re.IGNORECASE,
 )
 
@@ -82,39 +75,45 @@ def fetch_dataset_resources(slug: str) -> list[dict]:
     return resources
 
 
-def select_resources_for_period(
-    resources: list[dict],
-    start_year: int,
-    end_year: int,
-) -> list[tuple[str, str]]:
-    """
-    Sélectionne les ressources qui couvrent la période demandée.
+def _parse_period_bounds(period: str) -> tuple[int, int]:
+    """Convertit une chaîne de période en (start_year, end_year)."""
+    if period.startswith("avant-"):
+        return (1850, int(period.split("-", 1)[1]))
+    parts = period.split("-")
+    if len(parts) == 1:
+        y = int(parts[0])
+        return (y, y)
+    return (int(parts[0]), int(parts[1]))
 
-    Retourne une liste de (nom_fichier, url_telechargement).
+
+def select_resources_for_year(
+    resources: list[dict], target_year: int,
+) -> list[tuple[str, str, str, str]]:
+    """
+    Sélectionne les ressources Météo-France contenant ``target_year``.
+
+    Retourne une liste de (titre, url_telechargement, dept, période).
     """
     selected = []
     for res in resources:
-        title = res.get("title", "") or res.get("filename", "") or ""
-        match = RESOURCE_PATTERN.search(title)
+        title = res.get("title", "") or ""
+        match = QUOT_PATTERN.search(title)
         if not match:
             continue
         dept = match.group("dept")
-        kind = match.group("kind").lower()
-        r_start = int(match.group("start"))
-        r_end = int(match.group("end"))
-        # garde si la période couverte par la ressource intersecte
-        # la période demandée
-        if r_end >= start_year and r_start <= end_year:
-            url = res.get("url") or res.get("latest")
+        period = match.group("period")
+        r_start, r_end = _parse_period_bounds(period)
+        if r_start <= target_year <= r_end:
+            url = res.get("latest") or res.get("url")
             if url:
-                selected.append((title, url, dept, kind))
+                selected.append((title, url, dept, period))
     return selected
 
 
 def download_file(url: str, dest: Path, chunk_size: int = 1 << 14) -> bool:
     """Télécharge un fichier en streaming avec barre de progression."""
     try:
-        with requests.get(url, stream=True, timeout=60) as r:
+        with requests.get(url, stream=True, timeout=120) as r:
             r.raise_for_status()
             total = int(r.headers.get("content-length", 0))
             with open(dest, "wb") as f, tqdm(
@@ -133,9 +132,10 @@ def download_file(url: str, dest: Path, chunk_size: int = 1 << 14) -> bool:
         return False
 
 
-def download_for_period(period: str, start_year: int, end_year: int) -> None:
-    """Télécharge les fichiers Météo-France pour la période demandée."""
-    dest_dir = meteo_period_dir(period)
+def download_for_target_year(target_year: int, dest_subdir: str) -> None:
+    """Télécharge les fichiers Météo-France contenant l'année cible."""
+    dest_dir = meteo_period_dir(dest_subdir)
+    logger.info("Année cible : %d", target_year)
     logger.info("Répertoire de destination : %s", dest_dir)
 
     resources = fetch_dataset_resources(DATAGOUV_DATASET_QUOTIDIENNES)
@@ -148,32 +148,33 @@ def download_for_period(period: str, start_year: int, end_year: int) -> None:
         )
         return
 
-    matches = select_resources_for_period(resources, start_year, end_year)
+    matches = select_resources_for_year(resources, target_year)
     if not matches:
         logger.warning(
-            "Aucune ressource ne couvre %d-%d. Vérifier le dataset.",
-            start_year, end_year,
+            "Aucune ressource ne couvre l'année %d. Vérifier le dataset.",
+            target_year,
         )
         return
 
-    # Garder une seule ressource par département : préférer "latest" si
-    # disponible pour les années récentes, sinon "previous".
+    # Une seule ressource par département (devrait être unique pour une année donnée)
     by_dept: dict[str, tuple[str, str, str]] = {}
-    for title, url, dept, kind in matches:
-        if dept not in by_dept or kind == "latest":
-            by_dept[dept] = (title, url, kind)
+    for title, url, dept, period in matches:
+        if dept not in by_dept:
+            by_dept[dept] = (title, url, period)
 
     logger.info(
-        "%d département(s) à traiter pour la période %d-%d",
-        len(by_dept), start_year, end_year,
+        "%d département(s) à traiter pour l'année %d",
+        len(by_dept), target_year,
     )
 
     n_ok = 0
     n_skip = 0
     n_fail = 0
     for dept in sorted(by_dept):
-        title, url, kind = by_dept[dept]
-        dest = dest_dir / f"Q_{dept}_{period}.csv"
+        title, url, period = by_dept[dept]
+        # Détecter l'extension (CSV brut ou CSV gzippé)
+        ext = ".csv.gz" if url.lower().endswith(".gz") else ".csv"
+        dest = dest_dir / f"Q_{dept}_{period}{ext}"
         if dest.exists() and dest.stat().st_size > 0:
             logger.info("[%s] déjà présent (%s)", dept, dest.name)
             n_skip += 1
@@ -201,8 +202,8 @@ def main() -> int:
         help="Identifiant d'un épisode défini dans config/episodes.yaml",
     )
     grp.add_argument(
-        "--period",
-        help="Période Météo-France au format AAAA-AAAA (ex: 2025-2026)",
+        "--target-year", type=int,
+        help="Année cible à couvrir (ex: 2003, 2026)",
     )
     grp.add_argument(
         "--list-episodes",
@@ -219,13 +220,9 @@ def main() -> int:
             print(f"  {ep_id:<35} {ep.name}")
         return 0
 
-    if args.period:
-        # Période donnée explicitement
-        if "-" not in args.period:
-            logger.error("--period doit être de la forme AAAA-AAAA")
-            return 2
-        s_year, e_year = args.period.split("-", 1)
-        download_for_period(args.period, int(s_year), int(e_year))
+    if args.target_year:
+        subdir = str(args.target_year)
+        download_for_target_year(args.target_year, subdir)
         return 0
 
     if args.episode:
@@ -237,14 +234,11 @@ def main() -> int:
             )
             return 2
         ep = episodes[args.episode]
-        period = ep.meteo_data_period or (
-            f"{ep.start.year}-{ep.end.year}"
-            if ep.start.year != ep.end.year else f"{ep.start.year}-{ep.start.year}"
-        )
-        logger.info("Épisode : %s (%s → %s, période MF : %s)",
-                    ep.id, ep.start, ep.end, period)
-        s_y, e_y = period.split("-", 1)
-        download_for_period(period, int(s_y), int(e_y))
+        target_year = ep.end.year
+        subdir = ep.meteo_data_period or str(target_year)
+        logger.info("Épisode : %s (%s → %s, année cible : %d, sous-dossier : %s)",
+                    ep.id, ep.start, ep.end, target_year, subdir)
+        download_for_target_year(target_year, subdir)
         return 0
 
     parser.print_help()

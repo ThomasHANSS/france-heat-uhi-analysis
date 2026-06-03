@@ -53,7 +53,7 @@ NUIT_TROPICALE_SEUIL_C = 20.0  # seuil nuit tropicale, en °C
 def find_csv_files(period: str) -> list[Path]:
     """Liste les CSV Météo-France disponibles pour la période donnée."""
     d = meteo_period_dir(period)
-    files = sorted(d.glob("Q_*.csv"))
+    files = sorted(list(d.glob("Q_*.csv")) + list(d.glob("Q_*.csv.gz")))
     if not files:
         logger.warning(
             "Aucun fichier CSV trouvé dans %s. "
