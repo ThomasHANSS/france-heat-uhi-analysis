@@ -1,0 +1,72 @@
+cff-version: 1.2.0
+title: "france-heat-uhi-analysis: Pipeline d'analyse des vagues de chaleur françaises et de leur lien à l'îlot de chaleur urbain"
+message: "If you use this software or its outputs, please cite as below."
+type: software
+authors:
+  - family-names: HANS
+    given-names: Thomas
+repository-code: "https://github.com/ThomasHANSS/france-heat-uhi-analysis"
+license: MIT
+keywords:
+  - climate
+  - heatwave
+  - urban-heat-island
+  - france
+  - meteo-france
+  - local-climate-zones
+preferred-citation:
+  type: software
+  title: "france-heat-uhi-analysis"
+  authors:
+    - family-names: HANS
+      given-names: Thomas
+  year: 2026
+  repository-code: "https://github.com/ThomasHANSS/france-heat-uhi-analysis"
+
+references:
+  - type: article
+    title: "Local Climate Zones for Urban Temperature Studies"
+    authors:
+      - family-names: Stewart
+        given-names: Iain D.
+      - family-names: Oke
+        given-names: Tim R.
+    journal: "Bulletin of the American Meteorological Society"
+    year: 2012
+    volume: 93
+    issue: 12
+    start: 1879
+    end: 1900
+    doi: "10.1175/BAMS-D-11-00019.1"
+  - type: article
+    title: "A global map of local climate zones to support earth system modelling and urban-scale environmental science"
+    authors:
+      - family-names: Demuzere
+        given-names: Matthias
+      - family-names: Kittner
+        given-names: Jonas
+      - family-names: Martilli
+        given-names: Alberto
+      - family-names: Mills
+        given-names: Gerald
+      - family-names: Moede
+        given-names: Christian
+      - family-names: Stewart
+        given-names: Iain D.
+      - family-names: van Vliet
+        given-names: Jasper
+      - family-names: Bechtel
+        given-names: Benjamin
+    journal: "Earth System Science Data"
+    year: 2022
+    volume: 14
+    issue: 8
+    start: 3835
+    end: 3873
+    doi: "10.5194/essd-14-3835-2022"
+  - type: dataset
+    title: "Cartographie des Zones Climatiques Locales (LCZ) des 88 aires urbaines de plus de 50 000 habitants de France métropolitaine — LCZ_SPOT_2022_Fr"
+    authors:
+      - name: "Cerema, Pôle satellite"
+    year: 2024
+    url: "https://www.data.gouv.fr/datasets/cartographie-des-zones-climatiques-locales-lcz-des-88-aires-urbaines-de-plus-de-50-000-habitants-de-france-metropolitaine"

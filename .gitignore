@@ -1,0 +1,56 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+
+# Environnements virtuels
+venv/
+env/
+.venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# --- Données volumineuses (à ne pas pousser sur GitHub) ---
+# Les CSV bruts Météo-France et les rasters LCZ sont volumineux.
+# On versionne uniquement les scripts et les résultats agrégés.
+
+data/raw/meteo_france/*.csv
+data/raw/cerema_lcz/*.zip
+data/raw/cerema_lcz/*.shp
+data/raw/cerema_lcz/*.shx
+data/raw/cerema_lcz/*.dbf
+data/raw/cerema_lcz/*.prj
+data/raw/cerema_lcz/*.cpg
+data/raw/cerema_lcz/*.qml
+data/raw/cerema_lcz/*.xml
+data/raw/cerema_lcz/*.tif
+data/raw/cerema_lcz/*.tfw
+data/raw/cerema_lcz/*.pdf
+data/raw/demuzere_lcz/*.tif
+data/raw/demuzere_lcz/*.zip
+
+# On garde les .gitkeep pour préserver les dossiers
+!data/raw/*/.gitkeep
+!data/stations/.gitkeep
+!data/processed/.gitkeep
+!data/results/.gitkeep

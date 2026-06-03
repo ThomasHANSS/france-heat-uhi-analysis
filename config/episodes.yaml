@@ -1,0 +1,80 @@
+# Catalogue des épisodes caniculaires analysés
+# ----------------------------------------------
+# Format YAML lu par le pipeline pour configurer l'analyse d'un épisode.
+# Pour ajouter un nouvel épisode : ajouter une entrée avec son identifiant en
+# clé, et les champs requis ci-dessous. Documenter aussi l'épisode dans
+# docs/EPISODES.md.
+#
+# Champs obligatoires :
+#   name        : intitulé lisible de l'épisode
+#   start       : date de début (YYYY-MM-DD)
+#   end         : date de fin (YYYY-MM-DD)
+#   type        : heat_dome | heatwave | prolonged_heatwave
+# Champs optionnels :
+#   context     : description courte de la situation synoptique
+#   meteo_data_period : période Météo-France à télécharger (ex: "2025-2026")
+#                       — si non précisé, déduit des années start/end
+
+dome-chaleur-mai-2026:
+  name: "Dôme de chaleur de fin mai 2026"
+  start: 2026-05-20
+  end: 2026-05-29
+  type: heat_dome
+  context: |
+    Anticyclone bloqué avec advection d'air saharien sur l'ouest et le sud
+    du pays. Configuration synoptique en oméga. Étude principale du projet.
+  meteo_data_period: "2025-2026"
+
+canicule-aout-2003:
+  name: "Canicule historique d'août 2003"
+  start: 2003-08-01
+  end: 2003-08-15
+  type: prolonged_heatwave
+  context: |
+    Canicule exceptionnelle, 15 jours de Tn élevées sur la majeure partie
+    du pays. Anticyclone subtropical durablement installé. Excès de
+    mortalité massif (~15 000 décès en France métropolitaine).
+  meteo_data_period: "2003-2003"
+
+vague-chaleur-juin-2019:
+  name: "Vague de chaleur précoce de juin 2019"
+  start: 2019-06-24
+  end: 2019-06-30
+  type: heatwave
+  context: |
+    Vague de chaleur précoce intense, record absolu national battu le
+    28 juin 2019 (46,0°C à Gallargues-le-Montueux, 30). Configuration
+    synoptique : plume saharienne sur le sud-est.
+  meteo_data_period: "2019-2019"
+
+vague-chaleur-juillet-2019:
+  name: "Vague de chaleur de juillet 2019"
+  start: 2019-07-21
+  end: 2019-07-27
+  type: heatwave
+  context: |
+    Seconde vague de chaleur de l'été 2019, surtout intense sur le quart
+    nord-est. Record absolu à Paris-Montsouris le 25 juillet (42,6°C).
+  meteo_data_period: "2019-2019"
+
+vague-chaleur-juillet-2022:
+  name: "Vague de chaleur de juillet 2022"
+  start: 2022-07-12
+  end: 2022-07-25
+  type: heatwave
+  context: |
+    Vague de chaleur d'ampleur exceptionnelle, particulièrement sévère
+    sur la façade atlantique et le sud-ouest. Multiples records absolus
+    sur le pourtour atlantique (Biarritz, La Rochelle, Brest).
+  meteo_data_period: "2022-2022"
+
+canicule-aout-2023:
+  name: "Canicule d'août 2023"
+  start: 2023-08-15
+  end: 2023-08-25
+  type: heatwave
+  context: |
+    Canicule tardive et intense, marquée notamment dans la vallée du
+    Rhône et le sud-est. Tn élevées soutenues, multiples nuits tropicales
+    en Méditerranée et Provence.
+  meteo_data_period: "2023-2023"

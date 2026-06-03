@@ -1,0 +1,64 @@
+# Mapping des classes LCZ (Stewart & Oke 2012) vers les catégories
+# utilisées pour l'analyse ICU.
+#
+# Le système LCZ comprend 17 classes :
+#   - 10 classes "bâties" (LCZ 1 à 10)
+#   - 7 classes "couverture naturelle" (LCZ A à G, codées 11 à 17 en raster)
+#
+# Référence :
+#   Stewart, I. D., & Oke, T. R. (2012). Local Climate Zones for Urban
+#   Temperature Studies. Bulletin of the American Meteorological Society,
+#   93(12), 1879-1900. https://doi.org/10.1175/BAMS-D-11-00019.1
+
+# Code numérique des classes LCZ tel qu'utilisé dans les rasters Cerema
+# et Demuzere et al. 2022 (compatible).
+lcz_codes:
+  1:  "Compact high-rise"            # cœur urbain dense, gratte-ciel
+  2:  "Compact midrise"              # tissu urbain européen typique dense
+  3:  "Compact lowrise"              # vieux quartiers, médinas, denses bas
+  4:  "Open high-rise"               # grands ensembles modernes aérés
+  5:  "Open midrise"                 # résidentiel collectif aéré
+  6:  "Open lowrise"                 # pavillonnaire résidentiel
+  7:  "Lightweight lowrise"          # habitat précaire / bidonville
+  8:  "Large lowrise"                # zones commerciales, entrepôts, aéroports
+  9:  "Sparsely built"               # bâti rural dispersé
+  10: "Heavy industry"               # zones industrielles lourdes
+  11: "Dense trees"                  # forêt dense (LCZ A)
+  12: "Scattered trees"              # bois clair (LCZ B)
+  13: "Bush, scrub"                  # broussaille, garrigue (LCZ C)
+  14: "Low plants"                   # cultures, prairies (LCZ D)
+  15: "Bare rock or paved"           # roche nue / surfaces minérales (LCZ E)
+  16: "Bare soil or sand"            # sol nu, sable (LCZ F)
+  17: "Water"                        # plans d'eau (LCZ G)
+
+# Agrégation pour l'analyse ICU :
+#   urbain_compact : cœur urbain dense, ICU potentiellement fort
+#   urbain_aere    : tissu résidentiel ouvert, ICU modéré
+#   bati_special   : commercial / industriel / sparse, ICU variable
+#   non_bati       : végétation ou eau, pas d'ICU intrinsèque
+categories:
+  urbain_compact:
+    label: "Urbain compact (cœur dense)"
+    lcz_codes: [1, 2, 3]
+    color: "#8B0000"
+  urbain_aere:
+    label: "Urbain aéré (résidentiel ouvert)"
+    lcz_codes: [4, 5, 6]
+    color: "#E37222"
+  bati_special:
+    label: "Bâti spécifique (commercial / industriel / dispersé)"
+    lcz_codes: [7, 8, 9, 10]
+    color: "#C9A66B"
+  non_bati:
+    label: "Non bâti (végétation, sol nu, eau)"
+    lcz_codes: [11, 12, 13, 14, 15, 16, 17]
+    color: "#2E7D32"
+
+# Règle de classification d'une station selon la composition LCZ dans son buffer.
+#   On retient la classe LCZ majoritaire dans le buffer 500 m.
+#   Pour les analyses sensibles, on calcule aussi un buffer 300 m (footprint
+#   immédiat) et on signale les éventuelles divergences.
+classification:
+  buffer_radii_m: [300, 500]
+  primary_radius_m: 500
+  flag_divergence_threshold: 0.20  # signaler si 20% d'écart entre buffer 300 et 500m

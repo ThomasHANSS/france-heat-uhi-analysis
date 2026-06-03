@@ -1,0 +1,46 @@
+france-heat-uhi-analysis
+========================
+
+Ce projet utilise un double schéma de licence :
+
+* Le **code** (répertoire `scripts/` et tout fichier `.py`) est distribué sous
+  licence MIT (voir ci-dessous).
+
+* Les **données dérivées** (`data/processed/`, `data/results/`) et le **texte
+  des articles** (`articles/`) sont distribués sous licence Creative Commons
+  Attribution 4.0 International (CC-BY 4.0) :
+  https://creativecommons.org/licenses/by/4.0/
+
+* Les **données sources** restent sous leur licence d'origine :
+  - Données Météo-France (`data/raw/meteo_france/`) :
+    Licence Ouverte / Open Licence v2.0 (Etalab)
+    https://www.etalab.gouv.fr/licence-ouverte-open-licence
+  - Données LCZ Cerema (`data/raw/cerema_lcz/`) :
+    Licence Ouverte / Open Licence v2.0 (Etalab)
+  - Données LCZ Demuzere et al. 2022 (`data/raw/demuzere_lcz/`) :
+    CC-BY 4.0 — citation requise : Demuzere et al. (2022), ESSD,
+    DOI 10.5194/essd-14-3835-2022
+
+
+MIT License (code)
+==================
+
+Copyright (c) 2026 Thomas HANS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
