@@ -54,3 +54,18 @@ data/raw/demuzere_lcz/*.zip
 !data/stations/.gitkeep
 !data/processed/.gitkeep
 !data/results/.gitkeep
+
+# Cerema LCZ : ignorer fichiers volumineux dans tous les sous-dossiers
+data/raw/cerema_lcz/**/*.shp
+data/raw/cerema_lcz/**/*.shx
+data/raw/cerema_lcz/**/*.dbf
+data/raw/cerema_lcz/**/*.prj
+data/raw/cerema_lcz/**/*.cpg
+data/raw/cerema_lcz/**/*.qml
+data/raw/cerema_lcz/**/*.tif
+data/raw/cerema_lcz/**/*.pdf
+data/raw/cerema_lcz/**/*.xml
+data/raw/cerema_lcz/**/*.zip
+
+# Archives racine
+*.zip

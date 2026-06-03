@@ -59,6 +59,6 @@ categories:
 #   Pour les analyses sensibles, on calcule aussi un buffer 300 m (footprint
 #   immédiat) et on signale les éventuelles divergences.
 classification:
-  buffer_radii_m: [300, 500]
+  buffer_radii_m: [100, 300, 500]
   primary_radius_m: 500
   flag_divergence_threshold: 0.20  # signaler si 20% d'écart entre buffer 300 et 500m
