@@ -28,7 +28,9 @@ USAGE
 from __future__ import annotations
 
 import argparse
+import gzip
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -111,12 +113,13 @@ def select_resources_for_year(
 
 
 def download_file(url: str, dest: Path, chunk_size: int = 1 << 14) -> bool:
-    """Télécharge un fichier en streaming avec barre de progression."""
+    """Télécharge un fichier en streaming, et décompresse à la volée si gzip."""
     try:
         with requests.get(url, stream=True, timeout=120) as r:
             r.raise_for_status()
             total = int(r.headers.get("content-length", 0))
-            with open(dest, "wb") as f, tqdm(
+            tmp = dest.with_suffix(dest.suffix + ".tmp")
+            with open(tmp, "wb") as f, tqdm(
                 total=total, unit="B", unit_scale=True,
                 desc=dest.name, leave=False,
             ) as bar:
@@ -124,6 +127,15 @@ def download_file(url: str, dest: Path, chunk_size: int = 1 << 14) -> bool:
                     if chunk:
                         f.write(chunk)
                         bar.update(len(chunk))
+        # Détection gzip via magic bytes, et décompression si besoin
+        with open(tmp, "rb") as fh:
+            magic = fh.read(2)
+        if magic == b"\x1f\x8b":
+            with gzip.open(tmp, "rb") as fin, open(dest, "wb") as fout:
+                shutil.copyfileobj(fin, fout)
+            tmp.unlink(missing_ok=True)
+        else:
+            tmp.replace(dest)
         return True
     except requests.RequestException as e:
         logger.error("  Échec téléchargement %s : %s", url, e)
