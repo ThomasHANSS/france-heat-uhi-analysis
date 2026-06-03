@@ -34,7 +34,7 @@ canicule-aout-2003:
     Canicule exceptionnelle, 15 jours de Tn élevées sur la majeure partie
     du pays. Anticyclone subtropical durablement installé. Excès de
     mortalité massif (~15 000 décès en France métropolitaine).
-  meteo_data_period: "2003-2003"
+  meteo_data_period: "1950-2024"
 
 vague-chaleur-juin-2019:
   name: "Vague de chaleur précoce de juin 2019"
@@ -45,7 +45,7 @@ vague-chaleur-juin-2019:
     Vague de chaleur précoce intense, record absolu national battu le
     28 juin 2019 (46,0°C à Gallargues-le-Montueux, 30). Configuration
     synoptique : plume saharienne sur le sud-est.
-  meteo_data_period: "2019-2019"
+  meteo_data_period: "1950-2024"
 
 vague-chaleur-juillet-2019:
   name: "Vague de chaleur de juillet 2019"
@@ -55,7 +55,7 @@ vague-chaleur-juillet-2019:
   context: |
     Seconde vague de chaleur de l'été 2019, surtout intense sur le quart
     nord-est. Record absolu à Paris-Montsouris le 25 juillet (42,6°C).
-  meteo_data_period: "2019-2019"
+  meteo_data_period: "1950-2024"
 
 vague-chaleur-juillet-2022:
   name: "Vague de chaleur de juillet 2022"
@@ -66,7 +66,7 @@ vague-chaleur-juillet-2022:
     Vague de chaleur d'ampleur exceptionnelle, particulièrement sévère
     sur la façade atlantique et le sud-ouest. Multiples records absolus
     sur le pourtour atlantique (Biarritz, La Rochelle, Brest).
-  meteo_data_period: "2022-2022"
+  meteo_data_period: "1950-2024"
 
 canicule-aout-2023:
   name: "Canicule d'août 2023"
@@ -77,4 +77,4 @@ canicule-aout-2023:
     Canicule tardive et intense, marquée notamment dans la vallée du
     Rhône et le sud-est. Tn élevées soutenues, multiples nuits tropicales
     en Méditerranée et Provence.
-  meteo_data_period: "2023-2023"
+  meteo_data_period: "1950-2024"

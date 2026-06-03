@@ -65,14 +65,19 @@ def find_csv_files(period: str) -> list[Path]:
 
 def load_station_data(csv_path: Path, dates_yyyymmdd: set[str]) -> pd.DataFrame:
     """
-    Charge un CSV Météo-France et filtre sur l'ensemble des dates demandées.
+    Charge un CSV Météo-France par chunks pour limiter la consommation RAM,
+    et filtre immédiatement sur l'ensemble des dates demandées.
 
-    Les CSV Météo-France ont pour séparateur ';' et un encodage UTF-8.
+    Crucial pour les fichiers historiques 1950-2024 qui pèsent plusieurs Go
+    décompressés. Sans chunking, pandas charge des centaines de millions de
+    lignes en mémoire avant de filtrer.
+
     Les colonnes clés utilisées :
         NUM_POSTE, NOM_USUEL, LAT, LON, ALTI, AAAAMMJJ, TN, TX, TM
     """
+    chunks = []
     try:
-        df = pd.read_csv(
+        reader = pd.read_csv(
             csv_path,
             sep=";",
             encoding="utf-8",
@@ -84,12 +89,19 @@ def load_station_data(csv_path: Path, dates_yyyymmdd: set[str]) -> pd.DataFrame:
                 "NUM_POSTE", "NOM_USUEL", "LAT", "LON", "ALTI",
                 "AAAAMMJJ", "TN", "TX", "TM",
             },
+            chunksize=500_000,
             low_memory=False,
         )
+        for chunk in reader:
+            filtered = chunk[chunk["AAAAMMJJ"].isin(dates_yyyymmdd)]
+            if not filtered.empty:
+                chunks.append(filtered.copy())
     except (UnicodeDecodeError, FileNotFoundError) as e:
         logger.warning("Lecture %s impossible : %s", csv_path.name, e)
         return pd.DataFrame()
-    df = df[df["AAAAMMJJ"].isin(dates_yyyymmdd)].copy()
+    if not chunks:
+        return pd.DataFrame()
+    df = pd.concat(chunks, ignore_index=True)
     for col in ("TN", "TX", "TM", "LAT", "LON", "ALTI"):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
