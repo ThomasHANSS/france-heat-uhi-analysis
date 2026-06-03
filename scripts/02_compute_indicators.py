@@ -162,7 +162,9 @@ def run(episode: Episode, min_days: int = 7) -> Path:
     logger.info("Lecture de %d fichiers CSV départementaux", len(csv_files))
 
     all_indicators = []
-    for fp in csv_files:
+    n_total = len(csv_files)
+    for i, fp in enumerate(csv_files, 1):
+        logger.info("  [%d/%d] %s", i, n_total, fp.name)
         df = load_station_data(fp, dates)
         if df.empty:
             continue

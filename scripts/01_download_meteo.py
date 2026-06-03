@@ -113,13 +113,17 @@ def select_resources_for_year(
 
 
 def download_file(url: str, dest: Path, chunk_size: int = 1 << 14) -> bool:
-    """Télécharge un fichier en streaming, et décompresse à la volée si gzip."""
+    """Télécharge un fichier en streaming et le sauve TEL QUEL à ``dest``.
+
+    N'effectue PAS de décompression : si le contenu est gzippé, le fichier
+    reste compressé. Pandas et autres outils gèrent les .csv.gz nativement,
+    et on économise ~10x l'espace disque par rapport à la décompression.
+    """
     try:
         with requests.get(url, stream=True, timeout=120) as r:
             r.raise_for_status()
             total = int(r.headers.get("content-length", 0))
-            tmp = dest.with_suffix(dest.suffix + ".tmp")
-            with open(tmp, "wb") as f, tqdm(
+            with open(dest, "wb") as f, tqdm(
                 total=total, unit="B", unit_scale=True,
                 desc=dest.name, leave=False,
             ) as bar:
@@ -127,15 +131,6 @@ def download_file(url: str, dest: Path, chunk_size: int = 1 << 14) -> bool:
                     if chunk:
                         f.write(chunk)
                         bar.update(len(chunk))
-        # Détection gzip via magic bytes, et décompression si besoin
-        with open(tmp, "rb") as fh:
-            magic = fh.read(2)
-        if magic == b"\x1f\x8b":
-            with gzip.open(tmp, "rb") as fin, open(dest, "wb") as fout:
-                shutil.copyfileobj(fin, fout)
-            tmp.unlink(missing_ok=True)
-        else:
-            tmp.replace(dest)
         return True
     except requests.RequestException as e:
         logger.error("  Échec téléchargement %s : %s", url, e)
@@ -184,19 +179,37 @@ def download_for_target_year(target_year: int, dest_subdir: str) -> None:
     n_fail = 0
     for dept in sorted(by_dept):
         title, url, period = by_dept[dept]
-        # Détecter l'extension (CSV brut ou CSV gzippé)
-        ext = ".csv.gz" if url.lower().endswith(".gz") else ".csv"
-        dest = dest_dir / f"Q_{dept}_{period}{ext}"
-        if dest.exists() and dest.stat().st_size > 0:
-            logger.info("[%s] déjà présent (%s)", dept, dest.name)
+        # On stocke en .csv.gz pour économiser l'espace disque (~10x).
+        # Pandas lit nativement les .csv.gz. Accepter aussi un .csv déjà présent.
+        candidates = [
+            dest_dir / f"Q_{dept}_{period}.csv.gz",
+            dest_dir / f"Q_{dept}_{period}.csv",
+        ]
+        existing = next(
+            (c for c in candidates if c.exists() and c.stat().st_size > 0),
+            None,
+        )
+        if existing is not None:
+            logger.info("[%s] déjà présent (%s)", dept, existing.name)
             n_skip += 1
             continue
+        dest = dest_dir / f"Q_{dept}_{period}.csv.gz"
         logger.info("[%s] téléchargement %s …", dept, title)
         ok = download_file(url, dest)
-        if ok:
-            n_ok += 1
-        else:
+        if not ok:
             n_fail += 1
+            continue
+        # Vérifier les magic bytes ; si pas gzip, renommer en .csv
+        try:
+            with open(dest, "rb") as fh:
+                magic = fh.read(2)
+            if magic != b"\x1f\x8b":
+                renamed = dest_dir / f"Q_{dept}_{period}.csv"
+                dest.replace(renamed)
+                logger.info("  → fichier non-gzippé, renommé en %s", renamed.name)
+        except OSError:
+            pass
+        n_ok += 1
 
     logger.info(
         "Bilan : %d téléchargés, %d déjà présents, %d échecs",
