@@ -69,3 +69,4 @@ data/raw/cerema_lcz/**/*.zip
 
 # Archives racine
 *.zip
+logs/
