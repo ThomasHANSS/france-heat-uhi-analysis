@@ -70,3 +70,15 @@ data/raw/cerema_lcz/**/*.zip
 # Archives racine
 *.zip
 logs/
+
+# --- Joly 2010 typologie (raster INRAE) ---
+# Raster volumineux téléchargeable via API Dataverse (DOI INRAE 10.15454/98BHVH)
+# Voir scripts/06_attribute_joly_climate.py pour téléchargement
+data/raw/joly_2010/*.tif
+data/raw/joly_2010/*.zip
+
+# Données traitées intermédiaires lourdes (régénérables)
+data/processed/**/intermediate_*
+
+# Mais on garde les fichiers de référence stables (petits, à versionner)
+# Implicite via les règles ci-dessus (rien ne les ignore)
