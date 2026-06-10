@@ -82,3 +82,8 @@ data/processed/**/intermediate_*
 
 # Mais on garde les fichiers de référence stables (petits, à versionner)
 # Implicite via les règles ci-dessus (rien ne les ignore)
+
+# Données MF organisées en sous-dossiers (1950-2024/, 2025-2026/, etc.)
+data/raw/meteo_france/**/*.csv
+data/raw/meteo_france/**/*.csv.gz
+data/raw/meteo_france/**/*.zip
