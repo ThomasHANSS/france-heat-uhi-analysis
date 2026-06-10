@@ -1,0 +1,10 @@
+pair_id,label,n,delta_Tx_med,delta_Tx_min,delta_Tx_max,n_positive,wilcoxon_p_Tx,delta_Nt_med,wilcoxon_p_Nt,mai26_rank,note
+1L,Lariboisière vs Trappes,4,4.450000000000001,1.9000000000000021,5.900000000000002,4,,0.3571428571428571,,1,n=4 (Lariboisière active depuis ~2019)
+2L,Lariboisière vs Fontainebleau,4,9.25,3.700000000000003,11.3,4,,0.5714285714285714,,1,"Fontainebleau = trou à froid (substrat sableux, lisière forêt)"
+3L,Lariboisière vs Montsouris,4,3.6500000000000004,2.3000000000000007,4.400000000000002,4,,0.23376623376623376,,1,Intra-Paris (climat neutralisé)
+1M,Montsouris vs Trappes,6,1.3000000000000007,-0.3999999999999986,2.1000000000000014,5,0.03125,0.19999999999999998,0.03125,3,Proxy Paris urbain modéré (parc) sur 6 épisodes
+2M,Montsouris vs Fontainebleau,6,5.15,1.1999999999999993,6.899999999999999,6,0.015625,0.35714285714285715,0.015625,1,Proxy Paris urbain modéré (parc) sur 6 épisodes
+4a,Lyon Tête d'Or vs St-Exupéry,5,0.3000000000000007,-0.6000000000000014,1.0999999999999979,3,0.3125,0.0,0.4375,1,Tête d'Or = parc urbain (signal modéré attendu)
+4b,Lyon Tête d'Or vs Bron,5,1.1999999999999993,0.6999999999999993,3.3999999999999986,5,0.03125,0.0,0.25,1,Complément 1ère couronne (~4 km)
+5,Marseille-Obs vs Marignane,5,2.1999999999999993,1.0,3.400000000000002,5,0.03125,0.09090909090909094,0.0625,2,
+6,Bordeaux-Paulin vs Mérignac,6,0.4999999999999982,-1.8000000000000007,1.1000000000000014,4,0.34375,0.05,0.125,4,"Signal faible attendu (Paulin classé urbain ville, pas compact)"

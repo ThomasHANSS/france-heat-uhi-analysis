@@ -1,0 +1,55 @@
+pair_id,label,episode,delta_TnMax,delta_NTrop_taux
+1L,Lariboisière vs Trappes,mai26,5.900000000000002,0.7
+1L,Lariboisière vs Trappes,aou03,,
+1L,Lariboisière vs Trappes,jun19,,
+1L,Lariboisière vs Trappes,jul19,4.400000000000002,0.2857142857142857
+1L,Lariboisière vs Trappes,jul22,4.5,0.42857142857142855
+1L,Lariboisière vs Trappes,aou23,1.9000000000000021,0.18181818181818182
+2L,Lariboisière vs Fontainebleau,mai26,11.3,0.7
+2L,Lariboisière vs Fontainebleau,aou03,,
+2L,Lariboisière vs Fontainebleau,jun19,,
+2L,Lariboisière vs Fontainebleau,jul19,8.8,0.5714285714285714
+2L,Lariboisière vs Fontainebleau,jul22,9.7,0.5714285714285714
+2L,Lariboisière vs Fontainebleau,aou23,3.700000000000003,0.36363636363636365
+3L,Lariboisière vs Montsouris,mai26,4.400000000000002,0.49999999999999994
+3L,Lariboisière vs Montsouris,aou03,,
+3L,Lariboisière vs Montsouris,jun19,,
+3L,Lariboisière vs Montsouris,jul19,3.3000000000000007,0.0
+3L,Lariboisière vs Montsouris,jul22,4.0,0.2857142857142857
+3L,Lariboisière vs Montsouris,aou23,2.3000000000000007,0.18181818181818182
+1M,Montsouris vs Trappes,mai26,1.5,0.2
+1M,Montsouris vs Trappes,aou03,2.1000000000000014,0.19999999999999996
+1M,Montsouris vs Trappes,jun19,1.8999999999999986,0.7142857142857143
+1M,Montsouris vs Trappes,jul19,1.1000000000000014,0.2857142857142857
+1M,Montsouris vs Trappes,jul22,0.5,0.14285714285714285
+1M,Montsouris vs Trappes,aou23,-0.3999999999999986,0.0
+2M,Montsouris vs Fontainebleau,mai26,6.899999999999999,0.2
+2M,Montsouris vs Fontainebleau,aou03,4.800000000000001,0.6
+2M,Montsouris vs Fontainebleau,jun19,1.1999999999999993,0.4285714285714286
+2M,Montsouris vs Fontainebleau,jul19,5.5,0.5714285714285714
+2M,Montsouris vs Fontainebleau,jul22,5.699999999999999,0.2857142857142857
+2M,Montsouris vs Fontainebleau,aou23,1.4000000000000021,0.18181818181818182
+4a,Lyon Tête d'Or vs St-Exupéry,mai26,1.0999999999999979,0.2
+4a,Lyon Tête d'Or vs St-Exupéry,aou03,,
+4a,Lyon Tête d'Or vs St-Exupéry,jun19,-0.6000000000000014,-0.1428571428571428
+4a,Lyon Tête d'Or vs St-Exupéry,jul19,0.3000000000000007,0.0
+4a,Lyon Tête d'Or vs St-Exupéry,jul22,-0.6000000000000014,0.14285714285714285
+4a,Lyon Tête d'Or vs St-Exupéry,aou23,1.0,-0.18181818181818177
+4b,Lyon Tête d'Or vs Bron,mai26,3.3999999999999986,0.2
+4b,Lyon Tête d'Or vs Bron,aou03,,
+4b,Lyon Tête d'Or vs Bron,jun19,0.6999999999999993,-0.1428571428571428
+4b,Lyon Tête d'Or vs Bron,jul19,0.8000000000000007,0.0
+4b,Lyon Tête d'Or vs Bron,jul22,1.1999999999999993,0.14285714285714285
+4b,Lyon Tête d'Or vs Bron,aou23,1.1999999999999993,0.0
+5,Marseille-Obs vs Marignane,mai26,2.1999999999999993,0.3
+5,Marseille-Obs vs Marignane,aou03,,
+5,Marseille-Obs vs Marignane,jun19,2.1999999999999993,0.1428571428571428
+5,Marseille-Obs vs Marignane,jul19,1.0,0.0
+5,Marseille-Obs vs Marignane,jul22,1.6999999999999993,0.0714285714285714
+5,Marseille-Obs vs Marignane,aou23,3.400000000000002,0.09090909090909094
+6,Bordeaux-Paulin vs Mérignac,mai26,0.3999999999999986,0.1
+6,Bordeaux-Paulin vs Mérignac,aou03,1.0,-0.06666666666666676
+6,Bordeaux-Paulin vs Mérignac,jun19,0.5999999999999979,0.2857142857142857
+6,Bordeaux-Paulin vs Mérignac,jul19,1.1000000000000014,0.0
+6,Bordeaux-Paulin vs Mérignac,jul22,-0.40000000000000213,0.14285714285714285
+6,Bordeaux-Paulin vs Mérignac,aou23,-1.8000000000000007,0.0
