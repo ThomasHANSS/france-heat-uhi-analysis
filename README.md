@@ -1,174 +1,215 @@
 # france-heat-uhi-analysis
 
-**Pipeline reproductible d'analyse des vagues de chaleur françaises et de leur relation à l'îlot de chaleur urbain (ICU).**
+**Analyse empirique du contraste urbain compact vs non bâti pendant les épisodes caniculaires français, avec un focus sur le dôme de chaleur de mai 2026.**
 
-Ce dépôt fournit un cadre d'analyse documenté et reproductible pour étudier les épisodes caniculaires en France métropolitaine et distinguer, dans le signal thermique observé, ce qui relève du forçage synoptique (dôme de chaleur, advection, blocage anticyclonique) de ce qui relève du contexte urbain local (îlot de chaleur urbain).
+Le projet quantifie l'amplification thermique des cœurs urbains (LCZ "urbain compact") pendant six épisodes caniculaires couvrant 2003–2026, en stratifiant l'analyse par deux classifications climatiques officielles (Joly 2010 et RE2020). L'objectif est de séparer la signature d'**adaptation à l'îlot de chaleur urbain (ICU)** — phénomène chronique — de celle d'**adaptation aux extrêmes synoptiques** type dôme de chaleur — par nature aiguë et localisée.
 
-L'analyse croise :
+## Question de recherche
 
-* les **données climatologiques quotidiennes de Météo-France** (températures minimale, maximale, moyenne par station, sur la période d'épisode étudiée),
-* la **cartographie LCZ Cerema 2022** (Zones Climatiques Locales à 1,5 m, 88 aires urbaines de plus de 50 000 habitants en France métropolitaine),
-* la **carte LCZ globale Demuzere et al. 2022** (100 m, mêmes 17 classes Stewart & Oke 2012, en complément hors aires Cerema).
+L'adaptation thermique urbaine se concentre largement sur la **réduction de l'ICU** (végétalisation, albédo, désimperméabilisation), qui traite un excès chronique de quelques degrés. Mais le dôme du Pacifique Nord-Ouest 2021 (+15 à +20 °C au-dessus des normales, ~868 décès en 6 jours) a démontré qu'une autre catégorie d'événements pouvait dépasser brutalement les capacités d'adaptation, indépendamment du traitement urbain de fond.
 
-Six épisodes sont configurés par défaut : août 2003, juin 2019, juillet 2019, juillet 2022, août 2023, mai 2026.
+Le dôme de chaleur de mai 2026 sur la France — événement précoce, à signature synoptique centrée sur Paris — offre un cas d'étude récent pour tester empiriquement cette distinction. La question : **les cœurs urbains s'amplifient-ils plus pendant un dôme synoptique que pendant une canicule classique** ?
 
----
+## Données
 
-## Résultat principal — Dôme de chaleur de mai 2026
-
-L'analyse appliquée à l'épisode du 20 au 29 mai 2026 produit le constat suivant (voir `articles/dome-mai-2026/` pour le texte complet) :
-
-* le pic de température nocturne français sur l'épisode a été relevé à **Cap Béar (Pyrénées-Orientales), un phare maritime rural, à 26,2 °C** ;
-* parmi les **14 stations françaises qui ont enregistré au moins 5 nuits tropicales** (Tn ≥ 20 °C) sur l'épisode, **12 sont en contexte non-urbain** (rural, littoral, communes <50 000 hab) selon la classification LCZ Cerema + Demuzere ;
-* parmi les **25 stations Météo-France en cœur d'agglomération de plus de 100 000 habitants**, **une seule a enregistré ≥5 nuits tropicales** (Paris-Lariboisière), la **médiane des grandes villes étant à 1 nuit tropicale**.
-
-L'ICU joue localement et est documenté par les cartographies Cerema et MApUCE (Météo-France), mais il ne suffit pas à expliquer le signal observé en mai 2026 : la signature de cet épisode est avant tout synoptique et géographique, pas urbaine.
-
----
-
-## Architecture du dépôt
-
-```text
-france-heat-uhi-analysis/
-├── README.md                # ce fichier
-├── LICENSE                  # MIT (code) + CC-BY 4.0 (données dérivées et texte)
-├── CITATION.cff             # citation auto du dépôt
-├── requirements.txt         # dépendances Python
-│
-├── config/
-│   ├── episodes.yaml        # catalogue des épisodes étudiables
-│   └── lcz_categories.yaml  # mapping classes LCZ → catégories ICU
-│
-├── data/
-│   ├── raw/                 # données sources (non versionnées, voir .gitignore)
-│   │   ├── meteo_france/    # CSV Météo-France
-│   │   ├── cerema_lcz/      # rasters et shapefiles LCZ Cerema
-│   │   └── demuzere_lcz/    # raster LCZ global Demuzere
-│   ├── stations/            # métadonnées stations
-│   ├── processed/           # indicateurs calculés par épisode
-│   └── results/             # statistiques finales par épisode
-│
-├── scripts/
-│   ├── 00_run_pipeline.py            # pipeline complet pour un épisode
-│   ├── 01_download_meteo.py          # acquisition données Météo-France
-│   ├── 02_compute_indicators.py      # calcul NTrop, TnMax, TxMax par station
-│   ├── 03_classify_stations_lcz.py   # classification LCZ Cerema + Demuzere
-│   ├── 04_compute_stats.py           # statistiques par classe LCZ
-│   └── 05_make_figures.py            # figures publiables
-│
-├── articles/
-│   └── dome-mai-2026/                # articles produits sur l'épisode
-│       ├── post_x.md
-│       └── post_linkedin.md
-│
-└── docs/
-    ├── METHODOLOGY.md       # méthodologie détaillée
-    ├── EPISODES.md          # description des épisodes étudiés
-    ├── DATA_SOURCES.md      # sources de données, licences, citations
-    └── REPRODUCIBILITY.md   # comment refaire l'analyse de zéro
-```
-
----
-
-## Installation
-
-Prérequis : Python 3.10 ou supérieur.
-
-```bash
-# Cloner le dépôt
-git clone https://github.com/ThomasHANSS/france-heat-uhi-analysis.git
-cd france-heat-uhi-analysis
-
-# Créer un environnement virtuel et installer les dépendances
-python -m venv venv
-source venv/bin/activate    # sous Windows : venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-Les paquets `rasterio`, `geopandas` et `fiona` reposent sur GDAL. Si l'installation pip échoue (cas Windows fréquent), utiliser conda :
-
-```bash
-conda install -c conda-forge rasterio geopandas fiona pyproj shapely
-```
-
----
-
-## Utilisation
-
-### Analyser un épisode (exemple : mai 2026)
-
-```bash
-python scripts/00_run_pipeline.py --episode dome-chaleur-mai-2026
-```
-
-Le pipeline exécute en séquence :
-
-1. **Téléchargement** des données Météo-France pour la période, si absentes localement (`01_download_meteo.py`).
-2. **Téléchargement** des couches LCZ Cerema des aires urbaines pertinentes, si absentes (`03_classify_stations_lcz.py`).
-3. **Calcul des indicateurs** (NTrop = nombre de nuits tropicales avec Tn ≥ 20 °C, TnMax, TxMax) pour chaque station sur la période (`02_compute_indicators.py`).
-4. **Classification LCZ** de chaque station (`03_classify_stations_lcz.py`) : Cerema 1,5 m si la station est dans une aire urbaine couverte, sinon Demuzere 100 m.
-5. **Statistiques par classe LCZ** (`04_compute_stats.py`).
-6. **Génération des figures** publiables (`05_make_figures.py`).
-
-Les sorties sont écrites dans :
-
-* `data/processed/<episode-id>/` — fichiers intermédiaires
-* `data/results/<episode-id>/` — fichier `stats_<episode-id>.csv` et figures
-
-### Analyser tous les épisodes configurés
-
-```bash
-for ep in dome-chaleur-mai-2026 canicule-aout-2003 vague-chaleur-juin-2019 \
-          vague-chaleur-juillet-2019 vague-chaleur-juillet-2022 canicule-aout-2023; do
-    python scripts/00_run_pipeline.py --episode "$ep"
-done
-```
-
-### Ajouter un nouvel épisode
-
-Éditer `config/episodes.yaml` et ajouter une nouvelle entrée avec ses dates. Le pipeline le prendra en compte sans modification du code.
-
----
-
-## Sources de données et licences
-
-| Source | Producteur | Licence | Référence |
+| Source | Description | Période | Volume |
 |---|---|---|---|
-| Données climatologiques quotidiennes | Météo-France | Licence Ouverte 2.0 (Etalab) | [meteo.data.gouv.fr](https://meteo.data.gouv.fr) |
-| LCZ_SPOT_2022_Fr (88 aires urbaines, 1,5 m) | Cerema | Licence Ouverte 2.0 (Etalab) | [data.gouv.fr](https://www.data.gouv.fr/datasets/cartographie-des-zones-climatiques-locales-lcz-des-88-aires-urbaines-de-plus-de-50-000-habitants-de-france-metropolitaine) |
-| Global LCZ map (100 m) | Demuzere et al. 2022 | CC-BY 4.0 | [doi:10.5281/zenodo.6364594](https://doi.org/10.5281/zenodo.6364594) |
-
-Voir `docs/DATA_SOURCES.md` pour le détail.
-
----
+| **Météo-France** (meteo.data.gouv.fr) | Données climatologiques quotidiennes par département (RR, T, vent) | 1950–2026 | 96 fichiers CSV |
+| **Joly et al. 2010** (DOI INRAE 10.15454/98BHVH) | Raster typologique 8 classes (k-means multi-variable sur normales 1971-2000) | 1971-2000 | TYPO_RGF93.tif, ~65 Mo, Lambert-93 |
+| **CEREMA** | Polygones LCZ par agglomération | — | Shapefiles |
+| **Demuzere et al. 2022** | Raster LCZ continental européen 100 m | — | GeoTIFF |
+| **Arrêté du 26/10/2010 annexe I** | Mapping département → zone RE2020 (H1a–H3) | — | Texte réglementaire |
 
 ## Méthodologie
 
-Voir `docs/METHODOLOGY.md` pour la méthodologie détaillée. En résumé :
+### Classification climatique
 
-1. **Définition** : nuit tropicale = température minimale Tn ≥ 20 °C (seuil OMM/Météo-France).
-2. **Classification LCZ** : système Stewart & Oke 2012 (10 classes bâties + 7 non-bâties). Application sur buffers de 300 m et 500 m autour des coordonnées WGS84 de chaque station Météo-France.
-3. **Hybridation des sources LCZ** :
-   - Cerema 1,5 m utilisé en priorité quand la station est dans une des 88 aires urbaines françaises >50 000 habitants ;
-   - Demuzere 100 m utilisé pour toutes les autres stations.
-4. **Catégorisation finale** : `urbain_compact` (LCZ 1-3), `urbain_aere` (LCZ 4-6), `bati_special` (LCZ 7-10), `non_bati` (LCZ A-G).
+L'analyse stratifie les 1 845 stations actives sur la période 2003-2026 selon **deux grilles climatiques de granularité équivalente (8 classes)** :
 
----
+- **Joly et al. 2010** (8 types) — classification scientifique peer-reviewed par k-means multi-variable sur normales 1971-2000. Source : Cybergeo doc. 501 (DOI 10.4000/cybergeo.23155).
+- **RE2020 / TRACC** (8 zones H1a–H3) — classification officielle Météo-France/DHUP/CSTB, arrêté du 26 octobre 2010 (annexe I), repris inchangé dans l'arrêté du 4 août 2021. Stations de référence : Nancy (H1a), Trappes (H1b), Mâcon (H1c), Rennes (H2a), Tours (H2b), Agen (H2c), Carpentras (H2d), Marignane (H3).
 
-## Reproductibilité
+Les deux grilles ne sont pas équivalentes : Joly capture une typologie climatique scientifique multi-variable, RE2020 est une classification réglementaire par département. Leur utilisation conjointe sert de **test de robustesse** : si nos conclusions tiennent sous les deux grilles, l'argument est indépendant du choix de découpage.
 
-Voir `docs/REPRODUCIBILITY.md` pour refaire l'analyse complète à partir de zéro.
+### Classification LCZ hybride
 
-Toutes les figures et tables publiées dans les articles `articles/<episode>/` sont régénérables par exécution du pipeline. Aucune valeur n'est saisie manuellement ailleurs.
+Chaque station est attribuée à une catégorie LCZ via une logique hybride :
+- **CEREMA** quand l'agglomération couvre la station (priorité, plus précise)
+- **Demuzere et al. 2022** en fallback continental
+- Composition LCZ sur buffer 100 m / 300 m / 500 m → catégorie agrégée parmi `urbain_compact`, `urbain_aere`, `bati_special`, `non_bati`
 
----
+### Épisodes analysés
 
-## Citation
+| Épisode | Période | Durée | Nature |
+|---|---|---|---|
+| Canicule août 2003 | 01/08–15/08/2003 | 15 j | Canicule paroxystique nationale |
+| Vague juin 2019 | 24/06–30/06/2019 | 7 j | Méditerranéenne, record absolu (46 °C Gard) |
+| Vague juillet 2019 | 21/07–27/07/2019 | 7 j | Tardive de juillet |
+| Vague juillet 2022 | 12/07–25/07/2022 | 14 j | Estivale longue |
+| Canicule août 2023 | 15/08–25/08/2023 | 11 j | Méridionale tardive |
+| **Dôme mai 2026** | 20/05–29/05/2026 | 10 j | **Dôme précoce, couloir centré sur Paris** |
 
-Si vous utilisez ce dépôt ou ses sorties, merci de citer comme indiqué dans `CITATION.cff`, ainsi que les sources de données primaires (Météo-France, Cerema, Demuzere et al.).
+### Indicateurs
 
----
+- `TnMax` : température minimale maximale sur l'épisode (peak chaleur nocturne, métrique d'intensité non saturable)
+- `NTrop` : nombre absolu de nuits tropicales (Tn ≥ 20 °C) sur l'épisode
+- `NTrop_taux = NTrop / NDays` : taux normalisé pour comparabilité inter-épisodes
+- `NTrop_5j_max` : max sur fenêtre glissante de 5 jours (décorrèle l'intensité du pic de la durée totale)
+- `TnMoy_5j_max` : max de la Tn moyenne sur fenêtre glissante de 5 jours
 
-## Contact
+### Tests statistiques (étape 3b)
 
-Issues GitHub : [ThomasHANSS/france-heat-uhi-analysis/issues](https://github.com/ThomasHANSS/france-heat-uhi-analysis/issues)
+Comparaison UC (urbain compact) vs NB (non bâti) par épisode et par zone climatique :
+- **Mann-Whitney U** (non paramétrique, valide pour petits effectifs)
+- **Cliff's delta** avec **bootstrap 95% CI** (taille d'effet plus interprétable que p-value avec n petit)
+- Doublé en `UC+UA` vs `NB` pour test de robustesse à effectifs élargis (n = 170 vs n > 1500)
+
+## Pipeline
+
+```
+01_download_meteo.py              → Téléchargement données MF par département
+02_compute_indicators.py          → Indicateurs par épisode (TnMax, NTrop, TnMoy...)
+02b_compute_rolling_indicators.py → Indicateurs glissants 5 j (NTrop_5j_max, TnMoy_5j_max)
+03_attribute_lcz.py               → Attribution LCZ hybride CEREMA + Demuzere
+04_extract_episodes.py            → Filtre stations × période × indicateurs
+05_compare_episodes.py            → Synthèse comparative inter-épisodes
+06_attribute_joly_climate.py      → Attribution Joly 2010 (8 types)
+07_attribute_re2020_zone.py       → Attribution RE2020 (8 zones H1a–H3)
+```
+
+## Résultats principaux à l'étape 3b
+
+### Contraste UC vs NB toutes zones confondues
+
+Sur les 6 épisodes étudiés, le contraste TnMax entre stations LCZ "urbain compact" (n = 4-8) et "non bâti" (n > 1 500) est **significatif et de grande ampleur** (Cliff's δ ≥ 0,53) :
+
+| Épisode | Δ TnMax (UC – NB, médian) | Cliff's δ | p (Mann-Whitney) |
+|---|---|---|---|
+| **mai 2026** | **+4,70 °C** | **+0,89** [+0,84, +0,95] | 2,7 × 10⁻⁴ |
+| juillet 2019 | +5,00 °C | +0,95 [+0,90, +0,99] | 1,2 × 10⁻⁴ |
+| août 2003 | +3,60 °C | +0,78 [+0,62, +0,91] | 7,1 × 10⁻⁵ |
+| août 2023 | +3,70 °C | +0,74 [+0,49, +0,91] | 2,3 × 10⁻³ |
+| juillet 2022 | +3,20 °C | +0,74 [+0,45, +0,95] | 2,2 × 10⁻³ |
+| juin 2019 | +2,85 °C | +0,53 [+0,10, +0,96] | 3,4 × 10⁻² |
+
+### Résultat-clé : zone Joly 3 (bassin parisien, couloir du dôme)
+
+Sur la zone climatique correspondant au couloir géographique du dôme de mai 2026, l'amplification UC vs NB **bat tous les autres épisodes** :
+
+| Épisode | Δ TnMax sur Joly 3 | Cliff's δ |
+|---|---|---|
+| **mai 2026** | **+6,90 °C** | **+1,00** (séparation totale) |
+| juillet 2019 | +5,15 °C | +0,95 |
+| juillet 2022 | +4,55 °C | +0,77 |
+| août 2003 | +2,50 °C | +0,81 |
+| août 2023 | +1,65 °C | +0,67 |
+| juin 2019 | +0,80 °C | +0,40 |
+
+Cliff's δ = +1,00 signifie **séparation totale** des distributions UC et NB sur Paris. Aucun autre épisode n'atteint cette amplitude sur cette zone.
+
+### Pic glissant 5 jours (mai 2026)
+
+| Station | Catégorie | NTrop_5j_max | TnMoy_5j_max |
+|---|---|---|---|
+| Lariboisière (75) | urbain dense | 5/5 | **22,78 °C** |
+| Tour Eiffel (75) | mat exposé | 5/5 | 23,00 °C |
+| Luxembourg (75) | urbain parc | 3/5 | 20,10 °C |
+| Montsouris (75) | urbain parc | 2-3/5 | 19,74 °C |
+| Marseille-Obs (13) | urbain dense | 3/5 | 20,40 °C |
+| **Trappes (78)** | banlieue ouest | 0/5 | 17,42 °C |
+| **Melun (77)** | banlieue sud | 0/5 | 15,64 °C |
+| **Fontainebleau (77)** | forêt (trou à froid) | 0/5 | 12,38 °C |
+
+**Lariboisière vs Trappes : écart +5,4 °C** en Tn moyenne sur 5 jours consécutifs ; vs Fontainebleau : +10,4 °C.
+
+### Conclusion à l'étape 3b
+
+Mai 2026 produit **l'amplification UC vs NB la plus extrême** des 6 épisodes étudiés, malgré une température moyenne nationale très inférieure à août 2003 (NTrop_taux moyen = 0,03 vs 0,29). La signature du **dôme + couloir centré + ICU** est plus forte sur Paris que celle de la canicule paroxystique de 2003. Résultat empirique qui valide l'argument central du projet : **l'adaptation au dôme de chaleur n'est pas réductible à l'adaptation à l'ICU** — ce sont deux phénomènes physiquement et géographiquement distincts qui requièrent des politiques d'adaptation différentes.
+
+## Reproduire l'analyse
+
+### Dépendances
+
+```bash
+pip install pandas numpy scipy rasterio
+```
+
+### Téléchargement raster Joly 2010 (~65 Mo, hors Git)
+
+```bash
+mkdir -p data/raw/joly_2010
+curl -L "https://entrepot.recherche.data.gouv.fr/api/access/datafile/84435" \
+     -o data/raw/joly_2010/TYPO_RGF93.tif
+```
+
+### Pipeline d'analyse
+
+```bash
+# 1. Données MF
+python scripts/01_download_meteo.py
+
+# 2. Indicateurs par épisode + indicateurs glissants 5 j
+python scripts/02_compute_indicators.py
+bash scripts/run_rolling_indicators_other_episodes.sh
+
+# 3. Attribution LCZ hybride
+python scripts/03_attribute_lcz.py
+
+# 4. Attribution climatique (Joly + RE2020)
+python scripts/06_attribute_joly_climate.py \
+    --joly-raster data/raw/joly_2010/TYPO_RGF93.tif \
+    --stations data/processed/dome-chaleur-mai-2026/stations_lcz_dome-chaleur-mai-2026.csv \
+    --output data/processed/stations_climat_joly.csv
+
+python scripts/07_attribute_re2020_zone.py \
+    --input data/processed/stations_climat_joly.csv \
+    --output data/processed/stations_climat.csv
+```
+
+## Structure du repo
+
+```
+france-heat-uhi-analysis/
+├── data/
+│   ├── raw/                    # Données brutes (hors Git, re-téléchargeables)
+│   │   ├── meteo_france/
+│   │   ├── cerema_lcz/
+│   │   ├── demuzere_lcz/
+│   │   └── joly_2010/
+│   ├── processed/              # Données traitées (sélection trackée)
+│   │   ├── stations_climat.csv         ✓ tracké
+│   │   ├── stations_climat_joly.csv    ✓ tracké
+│   │   ├── indicators_normalized_*.csv ✓ tracké (6 épisodes)
+│   │   ├── synthese_normalisation_episodes.csv
+│   │   └── <episode>/
+│   │       ├── stations_lcz_<episode>.csv
+│   │       ├── indicators_<episode>.csv
+│   │       └── indicators_glissant.csv
+│   └── results/                # Résultats statistiques (trackés)
+│       ├── tests_3b_global.csv
+│       ├── tests_3b_stratified_tnmax.csv
+│       └── tests_3b_stratified_ntrop.csv
+└── scripts/
+    ├── 01_download_meteo.py
+    ├── 02_compute_indicators.py
+    ├── 02b_compute_rolling_indicators.py
+    ├── 03_attribute_lcz.py
+    ├── 04_extract_episodes.py
+    ├── 05_compare_episodes.py
+    ├── 06_attribute_joly_climate.py
+    └── 07_attribute_re2020_zone.py
+```
+
+## Licence
+
+Code : MIT
+Données dérivées : Licence Ouverte / Open Licence v2.0 (héritée de Météo-France)
+
+## Sources et citations
+
+- **Météo-France** — Données climatologiques de base, quotidiennes. meteo.data.gouv.fr, Licence Ouverte / Open Licence v2.0.
+- **Joly D., Brossard T., Cardot H., Cavailhès J., Hilal M., Wavresky P. (2010)** — *Les types de climats en France, une construction spatiale*. Cybergeo, doc. 501. DOI 10.4000/cybergeo.23155. Données : DOI INRAE 10.15454/98BHVH.
+- **Arrêté du 26 octobre 2010** (annexe I, mapping département → zone RE2020) et **arrêté du 4 août 2021** (RE2020). Légifrance.
+- **Météo-France / ADEME / CSTB / DHUP (2025)** — *Données climatiques prospectives France TRACC +2/+2,7/+4 °C*. data.ademe.fr.
+- **Demuzere M. et al. (2022)** — *European LCZ map*.
+- **CEREMA** — Polygones LCZ pour les principales agglomérations françaises.
